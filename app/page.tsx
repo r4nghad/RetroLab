@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import UploadArea from "@/components/UploadArea";
 import PrivacyBadge from "@/components/PrivacyBadge";
 import Editor from "@/components/Editor";
@@ -8,6 +8,14 @@ import Editor from "@/components/Editor";
 export default function Home() {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>("photo");
+
+  // Fire-and-forget: logs this visit's IP to the server console (visible in
+  // Render's Logs tab). Unrelated to image processing, which stays local.
+  useEffect(() => {
+    fetch("/api/log-visit").catch(() => {
+      // Ignore failures (e.g. offline) — this is non-critical analytics.
+    });
+  }, []);
 
   const handleImageSelected = useCallback((file: File) => {
     // FileReader keeps this entirely client-side — no upload, no network call.
